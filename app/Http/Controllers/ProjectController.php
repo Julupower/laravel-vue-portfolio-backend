@@ -2,30 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ProjectResource;
+use App\Http\Controllers\Controller;
 use App\Models\Project;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
 
 class ProjectController extends Controller
 {
-    /**
-     * Display a listing of published projects.
-     */
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResponse
     {
-        $projects = Project::query()
-            ->where('is_published', true)
-            ->latest('published_at')
-            ->paginate(10);
-
-        return ProjectResource::collection($projects);
+        return response()->json(Project::all());
     }
 
-    /**
-     * Display the specified project by its slug.
-     */
-    public function show(Project $project): ProjectResource
+    public function show(Project $project): JsonResponse
     {
-        return new ProjectResource($project);
+        return response()->json($project);
     }
 }
