@@ -4,39 +4,47 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title',
         'slug',
         'summary',
         'content',
-        'client_name',
-        'featured_image_url',
         'tech_stack',
+        'image_path',
         'is_published',
-        'published_at',
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Appends custom accessors to the model's array / JSON form.
      */
-    protected function casts(): array
+    protected $appends = [
+        'image_url',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'tech_stack' => 'array',
+        'is_published' => 'boolean',
+    ];
+
+    /**
+     * Get the full public URL for the project's image.
+     */
+    protected function imageUrl(): Attribute
     {
-        return [
-            'tech_stack' => 'array',
-            'is_published' => 'boolean',
-            'published_at' => 'datetime',
-        ];
+        return Attribute::make(
+            get: fn () => $this->image_path 
+                ? Storage::disk('public')->url($this->image_path) 
+                : null,
+        );
     }
 }
