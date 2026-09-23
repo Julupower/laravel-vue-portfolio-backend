@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
 {
@@ -14,37 +12,23 @@ class Project extends Model
     protected $fillable = [
         'title',
         'slug',
-        'summary',
-        'content',
+        'description',
         'tech_stack',
-        'image_path',
+        'github_url',
+        'live_url',
         'is_published',
     ];
 
-    /**
-     * Appends custom accessors to the model's array / JSON form.
-     */
-    protected $appends = [
-        'image_url',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     */
     protected $casts = [
-        'tech_stack' => 'array',
         'is_published' => 'boolean',
+        'tech_stack' => 'array',
     ];
 
     /**
-     * Get the full public URL for the project's image.
+     * Get the route key for implicit model binding.
      */
-    protected function imageUrl(): Attribute
+    public function getRouteKeyName(): string
     {
-        return Attribute::make(
-            get: fn () => $this->image_path 
-                ? Storage::disk('public')->url($this->image_path) 
-                : null,
-        );
+        return 'slug';
     }
 }
