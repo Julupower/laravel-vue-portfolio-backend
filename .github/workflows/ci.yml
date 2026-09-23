@@ -2,7 +2,7 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/github-actions-ci ]
   pull_request:
     branches: [ main ]
 
@@ -29,6 +29,12 @@ jobs:
 
       - name: Generate Key
         run: php artisan key:generate
+
+      - name: Run Migrations
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: php artisan migrate --force
 
       - name: Run Tests via Pest
         env:
