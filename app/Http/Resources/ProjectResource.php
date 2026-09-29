@@ -18,11 +18,12 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
-            'description' => $this->description, // <-- Ensure this key exists
+            'description' => $this->description,
             'tech_stack' => $this->tech_stack,
             'github_url' => $this->github_url,
             'live_url' => $this->live_url,
-            'is_published' => $this->is_published,
+            'image_path' => $this->image_path,
+            'is_published' => (bool) $this->is_published,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
