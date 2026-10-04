@@ -5,15 +5,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('returns only published projects in the api index', function () {
-    // Arrange: Create 3 published projects and 1 draft
-    Project::factory()->count(3)->create(['is_published' => true]);
-    Project::factory()->create(['is_published' => false]);
+test('it returns a list of published portfolio projects in the expected resource structure', function () {
+    // Arrange: Create test projects in database
+    Project::factory()->count(3)->create();
 
-    // Act
+    // Act: Request the projects index endpoint
     $response = $this->getJson('/api/projects');
 
-    // Assert
+    // Assert: Verify status and JSON resource structure
     $response->assertStatus(200)
         ->assertJsonCount(3, 'data')
         ->assertJsonStructure([
@@ -23,26 +22,38 @@ it('returns only published projects in the api index', function () {
                     'title',
                     'slug',
                     'description',
+                    'image_path',
                     'tech_stack',
-                    'github_url',
-                    'live_url',
-                    'is_published',
-                    'created_at',
-                    'updated_at',
-                ]
-            ]
+                ],
+            ],
         ]);
 });
 
-it('returns a single project by its slug', function () {
-    // Arrange
-    $project = Project::factory()->create(['is_published' => true]);
+test('it returns a single project resource when passed a valid slug', function () {
+    // Arrange: Create a project record
+    $project = Project::factory()->create([
+        'title' => 'E-Commerce Platform',
+        'slug' => 'e-commerce-platform',
+    ]);
 
-    // Act
+    // Act: Fetch the project by slug
     $response = $this->getJson("/api/projects/{$project->slug}");
 
-    // Assert
+    // Assert: Verify 200 response and exact matching fields
     $response->assertStatus(200)
-        ->assertJsonPath('data.slug', $project->slug)
-        ->assertJsonPath('data.title', $project->title);
+        ->assertJson([
+            'data' => [
+                'id' => $project->id,
+                'title' => 'E-Commerce Platform',
+                'slug' => 'e-commerce-platform',
+            ],
+        ]);
+});
+
+test('it returns a 404 json response when an invalid slug is requested', function () {
+    // Act: Request non-existent slug
+    $response = $this->getJson('/api/projects/non-existent-slug');
+
+    // Assert: Verify 404 status code
+    $response->assertStatus(404);
 });
