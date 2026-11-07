@@ -21,7 +21,9 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password123'),
         ]);
 
-        // Seed portfolio projects
-        Project::factory(10)->create();
+        // Seed portfolio projects via ProjectSeeder
+        $this->call([
+            ProjectSeeder::class,
+        ]);
     }
 }
